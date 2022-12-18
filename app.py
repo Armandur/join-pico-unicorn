@@ -12,6 +12,7 @@ inCall = False
 timer = None
 api_key = ""
 
+
 class Server(BaseHTTPRequestHandler):
     def _set_headers(self):
         self.send_response(200)
@@ -43,12 +44,16 @@ def callback(data):
 
     data = json.loads(data["json"])["push"]
     if data["title"] == "I samtal":
-        inCall = bool(int(data["text"]))
-    
-    print(inCall)
+        # inCall is pushed on tasker Phone Offhook and Phone Idle,
+        # but also value inCall is pushed every 1500ms in order to not stop at true or false wrongly
+        # Trigger on switch of value, not value updating
+        if bool(int(data["text"])) != inCall:
+            inCall = not inCall
+            print(f"State updated -  inCall: {inCall}")
+            
+            if inCall:
+                timer = time.time()
 
-    if inCall:
-        timer = time.time()
 
 def joinThread():
     global api_key
@@ -57,6 +62,7 @@ def joinThread():
     l = pyjoin.Listener(name="join-pico-unicorn",port=joinport, api_key=api_key)
     l.add_callback(callback)
     l.run()
+
 
 def webThread():
     print(f"WebThread starting")
