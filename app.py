@@ -5,7 +5,8 @@ import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 hostname = "localhost"
-serverport = 8585
+webserverport = 8585
+joinport = 5050
 
 inCall = False
 timer = None
@@ -22,11 +23,16 @@ class Server(BaseHTTPRequestHandler):
         self._set_headers()
         data = {
             "inCall": inCall,
-            "time": 0
+            "time": "0"
         }
 
         if inCall:
-            data["time"] = time.time() - timer
+            callTime = round(time.time() - timer)
+            if callTime < 60:
+                data["time"] = f"{callTime}s"
+            else:
+                minutes, seconds = divmod(callTime, 60)
+                data["time"] = f"{minutes}m{seconds}s"
 
         self.wfile.write(json.dumps(data).encode("utf-8"))
 
@@ -48,13 +54,13 @@ def joinThread():
     global api_key
     
     print(f"JoinThread starting")
-    l = pyjoin.Listener(name="join-pico-unicorn",port=5050, api_key=api_key)
+    l = pyjoin.Listener(name="join-pico-unicorn",port=joinport, api_key=api_key)
     l.add_callback(callback)
     l.run()
 
 def webThread():
     print(f"WebThread starting")
-    webServer = HTTPServer((hostname, serverport), Server)
+    webServer = HTTPServer((hostname, webserverport), Server)
     webServer.serve_forever()
 
 
@@ -64,6 +70,7 @@ if __name__ == "__main__":
     
     join = threading.Thread(target=joinThread)
     web = threading.Thread(target=webThread)
+
     join.start()
     web.start()
     
