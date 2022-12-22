@@ -5,6 +5,7 @@ import picounicorn
 import _thread
 import network
 import urequests
+import gc
 
 SSID = "Network"
 wlan = network.WLAN(network.STA_IF)
@@ -38,7 +39,7 @@ def checkStatus():
     global message
     global error
 
-    serverURL = "http://unicorn.pettersson-vik.se"
+    serverURL = "http://192.168.1.4:8585"
     while True:
         error = False
         response = urequests.get(serverURL)
@@ -46,6 +47,9 @@ def checkStatus():
         if response.status_code != 200:
             message = (f"Error {response.status_code}", 0)
             error = True
+
+            response.close()
+            gc.collect()
             time.sleep(1)
             continue
 
@@ -54,6 +58,7 @@ def checkStatus():
         message = (data["time"], 0)
 
         response.close()
+        gc.collect()
         time.sleep(1)
 
 
