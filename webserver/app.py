@@ -1,6 +1,7 @@
 import pyjoin
 import json
 import time
+import os
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
@@ -71,8 +72,11 @@ def webThread():
 
 
 if __name__ == "__main__":
-    with open("api", "r") as file:
-        api_key = file.readline()
+    if os.pasthexists("app"):
+        with open("api", "r") as file:
+            api_key = file.readline()
+    else:
+        api_key = os.environ["API"]
     
     join = threading.Thread(target=joinThread)
     web = threading.Thread(target=webThread)
