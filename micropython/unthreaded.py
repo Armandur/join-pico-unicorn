@@ -8,8 +8,10 @@ import network
 import urequests
 import gc
 
-ssid = "SSID"
-password = "PASSWORD"
+networks = [ ["SSID1", "Password1"], ["SSID2", "Password2"] ]
+
+ssid = "Pettersson Vik"
+password = "GoogleOverlord"
 
 gc.enable()
 
@@ -36,16 +38,22 @@ def scrollMessage(message, hue, speed):
 def connect():
     global scroll
     global wlan
-    wlan.active(True)
-    wlan.connect(ssid, password)
-    while wlan.isconnected() == False:
-        print('Waiting for connection...')
-        scrollMessage("Connecting...", 0.06, 0.01)
-        time.sleep(0.5)
-    print("Connected!")
-    scrollMessage("Connected!", 0.3, 0.01)
-    print(wlan.ifconfig())
+    global networks
     
+    wlan.active(True)
+    for ssid, password in networks:
+        wlan.connect(ssid, password)
+        for i in range(5):
+            if wlan.isconnected():
+                scrollMessage(f"Conn! {ssid}", 0.3, 0.001)
+                scrollMessage(str(wlan.ifconfig()[0]), 0.3, 0.001)
+                print(wlan.ifconfig())
+                print(f"Connected to {ssid}!")
+                return
+            
+            scrollMessage(f"Conn {ssid} {i+1}/5", 0.06, 0.001)
+            time.sleep(1)
+
 
 def fillColor(color):
     r, g, b = [255, 255, 255]
@@ -63,7 +71,7 @@ def checkStatus():
     global message
     global error
 
-    serverURL = "http://192.168.1.4:8585"
+    serverURL = "http://unicorn.pettersson-vik.se"
     try:
         response = urequests.get(serverURL)
         error = False
@@ -94,7 +102,8 @@ connect()
 while True or KeyboardInterrupt:
     checkStatus()
     if error:
-        scroll.show_message("Error", 0, 61)
+        scroll.clear()
+        scrollMessage("Error", 0, 0.01)
         time.sleep(0.1)
         continue
         
