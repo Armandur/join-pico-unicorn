@@ -10,9 +10,6 @@ import gc
 
 networks = [ ["SSID1", "Password1"], ["SSID2", "Password2"] ]
 
-ssid = "Pettersson Vik"
-password = "GoogleOverlord"
-
 gc.enable()
 
 w = picounicorn.get_width()
