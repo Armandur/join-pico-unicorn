@@ -72,7 +72,7 @@ def webThread():
 
 
 if __name__ == "__main__":
-    if os.pasthexists("app"):
+    if os.path.exists("api"):
         with open("api", "r") as file:
             api_key = file.readline()
     else:
