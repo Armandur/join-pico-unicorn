@@ -8,7 +8,7 @@ import network
 import urequests
 import gc
 
-networks = [ ["SSID1", "Password1"], ["SSID2", "Password2"] ]
+networks = [ [], [] ]
 
 gc.enable()
 
@@ -48,8 +48,11 @@ def connect():
                 print(f"Connected to {ssid}!")
                 return
             
+            error = False
             scrollMessage(f"Conn {ssid} {i+1}/5", 0.06, 0.001)
             time.sleep(1)
+    error = True
+    message = "No WiFi"
 
 
 def fillColor(color):
@@ -74,7 +77,7 @@ def checkStatus():
         error = False
     except Exception as e:
         error = True
-        print(e)
+        message = str(repr(e))
         return
 
     if response.status_code != 200:
@@ -97,10 +100,23 @@ t = time.time()
 connect()
 
 while True or KeyboardInterrupt:
-    checkStatus()
     if error:
         scroll.clear()
-        scrollMessage("Error", 0, 0.01)
+        scrollMessage(message, 0, 0.02)
+        time.sleep(0.1)
+        continue
+    
+    if not wlan.isconnected():
+        scroll.clear()
+        scrollMessage("No WiFi", 0, 0.02)
+        time.sleep(0.1)
+        connect()    
+    
+    checkStatus()
+    
+    if error:
+        scroll.clear()
+        scrollMessage(message, 0, 0.02)
         time.sleep(0.1)
         continue
         
