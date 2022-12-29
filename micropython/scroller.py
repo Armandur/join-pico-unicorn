@@ -10,10 +10,12 @@ picounicorn.init()
 class Scroller():
  
     offset = 0
+    rowOffset = 1
     gap = 1
     hue = 1.0
     saturation = 1.0
     brightness = 1.0
+
 
     def hsv2rgb(self, hue, sat, val):
         """ Returns the RGB of Hue Saturation and Brightnes values """
@@ -37,6 +39,7 @@ class Scroller():
         b = int(b*255)
         
         return r, g, b
+    
     
     def rgb2hsv(self, r:int, g:int, b:int):
         """ Returns the Hue Saturation and Value of RGB values """
@@ -70,19 +73,21 @@ class Scroller():
 
         return h, s, v 
     
+    
     def clear(self):
         for col in range(16):
             for row in range(7):
                 picounicorn.set_pixel(col, row, 0, 0, 0)
         
-    def display_character(self, character,pos):
+
+    def display_character(self, character, pos):
         r,g,b = self.hsv2rgb(self.hue, self.saturation, self.brightness)
-        for row in range(0,5):
+        for row in range(0, 5):
             length = len(character[0])
 
-            for col in range (0,length):
+            for col in range (0, length):
                 x = col+self.offset+pos
-                y = row+1
+                y = row+self.rowOffset
                 
                 # clear gap
                 if x+1 < 16 and x+1 > -1:
@@ -99,7 +104,7 @@ class Scroller():
         self.offset += len(character[0]) + self.gap
        
     
-    def show_message(self, message, position, hue:None):
+    def show_message(self, message, position, hue=None):
         """ Shows the message on the display, at the
             position provided, using the Hue value
             specified """
@@ -288,4 +293,4 @@ class Scroller():
                 
         self.offset = 0
     
-
+    
