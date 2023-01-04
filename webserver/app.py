@@ -6,8 +6,8 @@ import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 hostname = "0.0.0.0"
-webserverport = 8080
-joinport = 5050
+webserverport = 8585
+joinport = 1820
 
 inCall = False
 timer = None
